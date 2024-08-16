@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Navbar from './Navbar';
 import ImageGrid from './ImageGrid';
 import './App.css';
 
 function App() {
+  // States
   const [photos, setPhotos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [nextPageUrl, setNextPageUrl] = useState(null);
@@ -15,10 +17,12 @@ function App() {
   const [showAllPhotos, setShowAllPhotos] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
 
+  //Refs
   const loadedPhotoIds = useRef(new Set());
   const lastImageRef = useRef(null);
   const searchInputRef = useRef(null);
 
+  // Fetching from Unsplash API
   const fetchData = async (url) => {
     if (isLoading) return;
     setIsLoading(true);
@@ -54,6 +58,7 @@ function App() {
     }
   };
 
+  // Extracting "next" page URL from Link header
   const getNextPageLink = (linkHeader) => {
     if (!linkHeader) return null;
     const links = linkHeader.split(',');
@@ -61,10 +66,12 @@ function App() {
     return nextLink ? nextLink.trim().split(';')[0].slice(1, -1) : null;
   };
 
+  // Update search term
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
+  // Show new search results
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     loadedPhotoIds.current.clear();
@@ -75,12 +82,14 @@ function App() {
     setShowNavbar(true);
   };
 
+  // Search input automatic focus
   useEffect(() => {
     if (showNavbar && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [showNavbar]);
 
+  // Intersection Observer for infinite scrolling
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -103,10 +112,12 @@ function App() {
     return () => observer.disconnect();
   }, [isLoading, nextPageUrl]);
 
+  // Save favorites to session storage
   useEffect(() => {
     sessionStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
+  // Toggle favorite status
   const toggleFavorite = (photo) => {
     setFavorites((prevFavorites) => {
       const isFavorite = prevFavorites.some(
@@ -120,11 +131,13 @@ function App() {
     });
   };
 
+  // Show favorite photos
   const handleShowFavorites = () => {
     setShowAllPhotos(false);
     setPhotos(favorites); 
   };
 
+  // Logo click to homepage
   const handleLogoClick = () => {
     setSearchTerm('');
     setPhotos([]);
@@ -137,54 +150,15 @@ function App() {
 
   return (
     <div className="App">
-      {showNavbar && (
-        <nav className="navbar">
-          <div className="navbar-left"> 
-            <img
-              src="/imagespark-logo.png"
-              alt="ImageSpark Logo"
-              className="logo"
-              onClick={handleLogoClick}
-            />
-            {window.innerWidth > 780 && (
-              <span className="site-title" onClick={handleLogoClick}>
-                ImageSpark
-              </span>
-            )}
-            <form onSubmit={handleSearchSubmit} className="search-form">
-              <input
-                type="text"
-                ref={searchInputRef}
-                value={searchTerm}
-                onChange={handleSearchChange}
-                placeholder="Search images..."
-              />
-              <button type="submit">Search</button>
-            </form>
-          </div>
-          <div className="favorites-link" onClick={handleShowFavorites}>
-            {window.innerWidth > 780 && <span>See Favorites</span>}
-            <i className="fas fa-star"></i>{' '}
-          </div>
-        </nav>
-      )}
-      {!showNavbar && (
-        <div className="initial-search">
-          <img src="/imagespark-logo.png" alt="ImageSpark Logo" className="logo-initial" />
-          <h1 className="site-title">ImageSpark</h1>
-          <h2 className="slogan">Ignite Your Imagination</h2>
-          <form onSubmit={handleSearchSubmit}>
-            <input
-              type="text"
-              ref={searchInputRef}
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Search images..."
-            />
-            <button type="submit">Search</button>
-          </form>
-        </div>
-      )}
+      <Navbar
+        showNavbar={showNavbar}
+        handleLogoClick={handleLogoClick}
+        handleSearchSubmit={handleSearchSubmit}
+        searchInputRef={searchInputRef}
+        searchTerm={searchTerm}
+        handleSearchChange={handleSearchChange}
+        handleShowFavorites={handleShowFavorites}
+      />
       <ImageGrid
         photos={showAllPhotos ? photos : favorites}
         favorites={favorites}
