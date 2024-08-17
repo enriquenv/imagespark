@@ -1,4 +1,5 @@
 import React from 'react';
+import Footer from './Footer';
 
 const Navbar = ({
   showNavbar,
@@ -57,6 +58,7 @@ const Navbar = ({
             />
             <button type="submit">Search</button>
           </form>
+          <Footer />
         </div>
       )}
     </>

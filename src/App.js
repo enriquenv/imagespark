@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Navbar from './Navbar';
-import ImageGrid from './ImageGrid';
+import Navbar from './components/Navbar';
+import ImageGrid from './components/ImageGrid';
 import './App.css';
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
   const [nextPageUrl, setNextPageUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [favorites, setFavorites] = useState(() => {
-    const storedFavorites = sessionStorage.getItem('favorites');
+    const storedFavorites = localStorage.getItem('favorites');
     return storedFavorites ? JSON.parse(storedFavorites) : [];
   });
   const [showNavbar, setShowNavbar] = useState(false);
@@ -114,7 +114,7 @@ function App() {
 
   // Save favorites to session storage
   useEffect(() => {
-    sessionStorage.setItem('favorites', JSON.stringify(favorites));
+    localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
   // Toggle favorite status
